@@ -1,0 +1,65 @@
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main() {
+
+    int parent_pid = getpid();
+    printf("¡Hola! Soy el proceso principal con PID: %d\n", parent_pid);
+
+    pid_t pid;
+
+    pid = fork();
+
+    if (pid < 0) {
+        fprintf(stderr, "¡Vaya! No pude crear un nuevo proceso.");
+        exit(-1);
+    } else if (pid == 0) {
+        int kid_pid = getpid();
+        printf("¿Qué tal? Soy el hijo 1 con PID: %d\n", kid_pid);
+        execlp("/bin/echo", "echo", "hola", NULL);
+    }
+
+    wait(NULL);
+
+    pid = fork();
+
+    if (pid < 0) {
+        fprintf(stderr, "¡Uy! No pude crear otro proceso.");
+        exit(-1);
+    } else if (pid == 0) {
+        int kid_kid_pid = getpid();
+        printf("¡Hola de nuevo! Soy el hijo 2 con PID: %d\n", kid_kid_pid);
+        execlp("/bin/ls", "ls", NULL);
+    }
+
+    wait(NULL);
+
+    pid = fork();
+
+    if (pid < 0) {
+        fprintf(stderr, "Fallé una vez más.");
+        exit(-1);
+    } else if (pid == 0) {
+        execlp("/bin/date", "date", NULL);
+    }
+
+    wait(NULL);
+
+    pid = fork();
+
+    if (pid < 0) {
+        fprintf(stderr, "¡No otra vez! No pude duplicar.");
+        exit(-1);
+    } else if (pid == 0) {
+        printf("¡Hola desde el último hijo! 🌍\n");
+        exit(0);
+    }
+
+    wait(NULL);
+
+    printf("Todos mis peques han terminado. ¡Hasta luego! ✌️\n");
+    return 0;
+}
